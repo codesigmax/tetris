@@ -204,8 +204,8 @@ void Game::draw() {
         int pieceHeight = (maxY - minY + 1) * CELL_SIZE;
         
         // 计算居中偏移
-        int offsetX = (4 * CELL_SIZE - pieceWidth) / 2;
-        int offsetY = (4 * CELL_SIZE - pieceHeight) / 2;
+        int offsetX = (4 * CELL_SIZE - pieceWidth) / 2 - minX * CELL_SIZE;
+        int offsetY = (4 * CELL_SIZE - pieceHeight) / 2 - minY * CELL_SIZE;
         
         // 绘制居中的方块
         for (int i = 0; i < 4; i++) {

@@ -2,6 +2,7 @@
 
 Game::Game() : board(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0)), 
          currentPiece(4, std::vector<bool>(4)), 
+         nextPiece(4, std::vector<bool>(4)),
          currentX(BOARD_WIDTH/2 - 2),
          currentY(0),
          gameOver(false),
@@ -9,6 +10,8 @@ Game::Game() : board(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0)),
          lastMoveTime(0) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tetris");
     SetTargetFPS(60);
+    // 生成第一个方块和下一个方块
+    generateNewPiece(nextPiece);
     spawnNewPiece();
 }
 
@@ -57,17 +60,25 @@ void Game::rotatePiece() {
     }
 }
 
-void Game::spawnNewPiece() {
+void Game::generateNewPiece(std::vector<std::vector<bool>>& piece) {
     std::uniform_int_distribution<> dis(0, TETROMINOES.size() - 1);
     int index = dis(gen);
-    currentPiece = std::vector<std::vector<bool>>(4, std::vector<bool>(4));
+    piece = std::vector<std::vector<bool>>(4, std::vector<bool>(4));
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            currentPiece[i][j] = TETROMINOES[index][i][j];
+            piece[i][j] = TETROMINOES[index][i][j];
         }
     }
+}
+
+void Game::spawnNewPiece() {
+    // 将下一个方块设置为当前方块
+    currentPiece = nextPiece;
     currentX = BOARD_WIDTH/2 - 2;
     currentY = 0;
+
+    // 生成新的下一个方块
+    generateNewPiece(nextPiece);
 
     if (!canMove(currentX, currentY)) {
         gameOver = true;
@@ -144,6 +155,11 @@ void Game::draw() {
                       BOARD_WIDTH * CELL_SIZE + 2,
                       BOARD_HEIGHT * CELL_SIZE + 2, BLACK);
 
+    // 绘制下一个方块预览区域
+    DrawRectangleLines(PREVIEW_OFFSET_X - 1, PREVIEW_OFFSET_Y - 1,
+                      4 * CELL_SIZE + 2, 4 * CELL_SIZE + 2, BLACK);
+    DrawText("NEXT", PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y - 30, 20, BLACK);
+
     // 绘制已固定的方块
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
@@ -163,6 +179,41 @@ void Game::draw() {
                     DrawRectangle(BOARD_OFFSET_X + (currentX + j) * CELL_SIZE,
                                  BOARD_OFFSET_Y + (currentY + i) * CELL_SIZE,
                                  CELL_SIZE - 1, CELL_SIZE - 1, RED);
+                }
+            }
+        }
+    }
+
+    // 绘制下一个方块
+    if (!gameOver) {
+        // 计算方块的实际大小
+        int minX = 4, maxX = -1, minY = 4, maxY = -1;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (nextPiece[i][j]) {
+                    minX = std::min(minX, j);
+                    maxX = std::max(maxX, j);
+                    minY = std::min(minY, i);
+                    maxY = std::max(maxY, i);
+                }
+            }
+        }
+        
+        // 计算方块的宽度和高度
+        int pieceWidth = (maxX - minX + 1) * CELL_SIZE;
+        int pieceHeight = (maxY - minY + 1) * CELL_SIZE;
+        
+        // 计算居中偏移
+        int offsetX = (4 * CELL_SIZE - pieceWidth) / 2;
+        int offsetY = (4 * CELL_SIZE - pieceHeight) / 2;
+        
+        // 绘制居中的方块
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (nextPiece[i][j]) {
+                    DrawRectangle(PREVIEW_OFFSET_X + j * CELL_SIZE + offsetX,
+                                PREVIEW_OFFSET_Y + i * CELL_SIZE + offsetY,
+                                CELL_SIZE - 1, CELL_SIZE - 1, DARKBLUE);
                 }
             }
         }

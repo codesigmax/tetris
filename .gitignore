@@ -1,0 +1,45 @@
+# 编译输出目录
+build/
+
+# IDE配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 编译生成的文件
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.dylib
+*.so
+
+# CMake生成的文件
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# macOS系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 依赖管理文件
+conan.lock
+conanbuildinfo.*
+conaninfo.txt
+
+# 调试文件
+*.dSYM/
+*.su
+*.idb
+*.pdb

@@ -7,7 +7,8 @@ Game::Game() : board(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0)),
          currentY(0),
          gameOver(false),
          lastFallTime(0),
-         lastMoveTime(0) {
+         lastMoveTime(0),
+         score(0) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tetris");
     SetTargetFPS(60);
     // 生成第一个方块和下一个方块
@@ -37,6 +38,7 @@ void Game::resetGame() {
         std::fill(row.begin(), row.end(), 0);
     }
     gameOver = false;
+    score = 0;  // 重置分数
     currentX = BOARD_WIDTH/2 - 2;
     currentY = 0;
     spawnNewPiece();
@@ -159,6 +161,11 @@ void Game::draw() {
     DrawRectangleLines(PREVIEW_OFFSET_X - 1, PREVIEW_OFFSET_Y - 1,
                       4 * CELL_SIZE + 2, 4 * CELL_SIZE + 2, BLACK);
     DrawText("NEXT", PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y - 30, 20, BLACK);
+    
+    // 绘制分数
+    char scoreText[32];
+    sprintf(scoreText, "SCORE: %d", score);
+    DrawText(scoreText, PREVIEW_OFFSET_X, PREVIEW_OFFSET_Y + 4 * CELL_SIZE + 20, 20, BLACK);
 
     // 绘制已固定的方块
     for (int i = 0; i < BOARD_HEIGHT; i++) {
@@ -247,6 +254,8 @@ void Game::clearLines() {
             }
             // 清空最上面的行
             std::fill(board[0].begin(), board[0].end(), 0);
+            // 增加分数
+            score++;
             // 由于行已经下移，需要重新检查当前行
             i++;
         }

@@ -81,6 +81,7 @@ private:
     std::mt19937 gen{rd()};
     float lastFallTime;
     float lastMoveTime;
+    int score;  // 游戏分数
 
     void resetGame();
     void rotatePiece();
